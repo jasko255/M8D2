@@ -14,4 +14,21 @@ const AuthorSchema = new Schema(
   { timestamps: true }
 )
 
+
+
+AuthorSchema.pre("save", async function (next) {
+  // used not only on creation but also when user document is being modified (PUT)
+  // BEFORE saving the user in db, hash the password
+  const newAuthor = this
+  const plainPW = newAuthor.password
+
+  if (newAuthor.isModified("password")) {
+    // only if user is modifying the password we are going to "waste" CPU cycles in running hash function
+    newUser.password = await bcrypt.hash(plainPW, 10)
+  }
+  next()
+})
+
+
+
 export default model("Author", AuthorSchema)
