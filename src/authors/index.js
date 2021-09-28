@@ -10,6 +10,8 @@ import { fileURLToPath } from "url";
 
 import { parseFile } from "../utils/upload/index.js";
 
+import { generateCSV } from "../utils/csv/index.js";
+
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = dirname(__filename);
@@ -25,6 +27,30 @@ router.get("/", async (req, res, next) => {
     const fileAsString = fileAsBuffer.toString();
     const fileAsJSON = JSON.parse(fileAsString);
     res.send(fileAsJSON);
+  } catch (error) {
+    res.send(500).send({ message: error.message });
+  }
+});
+
+// get all authors export as csv
+router.get("/csv", async (req, res, next) => {
+  try {
+    const fileAsBuffer = fs.readFileSync(authorsFilePath);
+    const fileAsString = fileAsBuffer.toString();
+    const fileAsJSON = JSON.parse(fileAsString);
+    if (fileAsJSON.length > 0) {
+      const [first, ...rest] = fileAsJSON;
+      const fields = Object.keys(first);
+      const csvBuffer = generateCSV(fields, fileAsJSON);
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader(
+        "Content-Disposition",
+        'attachment; filename="authors.csv"'
+      );
+      res.send(csvBuffer);
+    } else {
+      res.status(404).send({ message: "there is no one here." });
+    }
   } catch (error) {
     res.send(500).send({ message: error.message });
   }
