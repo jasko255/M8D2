@@ -24,7 +24,7 @@ AuthorSchema.pre("save", async function (next) {
 
   if (newAuthor.isModified("password")) {
     // only if user is modifying the password we are going to "waste" CPU cycles in running hash function
-    newUser.password = await bcrypt.hash(plainPW, 10)
+    newAuthor.password = await bcrypt.hash(plainPW, 10)
   }
   next()
 })

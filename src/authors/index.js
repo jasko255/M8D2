@@ -13,6 +13,7 @@ authorsRouter.post("/register", async (req, res, next) => {
     res.status(201).send({ _id })
   } catch (error) {
     next(error)
+    console.log(error);
   }
 })
 
